@@ -1,30 +1,44 @@
-from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+
 from app.retriever import load_vectorstore
 
 def build_rag_chain():
     db = load_vectorstore()
+
     retriever = db.as_retriever(search_kwargs={"k": 5})
 
-    llm = ChatOpenAI(
-        model="gpt-4",
-        temperature=0
+    llm = ChatOpenAI(temperature=0)
+
+    memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True,
+        output_key="answer"
     )
 
-    
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(),
-        retriever=db.as_retriever(search_kwargs={"k": 5}),
+    qa_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        memory=memory,
         return_source_documents=True
     )
 
     return qa_chain
 
 
-def ask_question(query: str):
-    qa_chain = build_rag_chain()
-    result = qa_chain(query)
+qa_chain = build_rag_chain()
+
+def ask_question(query):
+    result = qa_chain.invoke({"question": query})
+
     return {
-        "answer": result["result"],
-        "sources": [doc.metadata for doc in result["source_documents"]]
+        "answer": result["answer"],
+        "sources": [
+            {
+                "source": doc.metadata.get("source"),
+                "page": doc.metadata.get("page")
+            }
+            for doc in result["source_documents"]
+        ]
     }
