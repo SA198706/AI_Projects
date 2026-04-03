@@ -2,37 +2,40 @@
 
 ## Overview
 
-This project implements a Retrieval-Augmented Generation (RAG) chatbot that allows users to query information from a PDF document. The system retrieves relevant content from the document and generates accurate, context-aware responses using an LLM.
+This project implements a Retrieval-Augmented Generation (RAG) chatbot that allows users to query information from PDF documents. It combines semantic search (FAISS) with an LLM to generate accurate, context-aware responses. The chatbot supports multi-turn conversations using memory.
 
 
 ## Features
 
-* PDF document ingestion
-* Text chunking for efficient retrieval
-* Embedding generation using OpenAI
-* Vector database using FAISS
-* Semantic search (top-k retrieval)
-* Context-aware response generation
-* FastAPI backend for querying
-* Source-based answers (page references)
+PDF document ingestion
+Text chunking
+Embedding generation
+Vector storage using FAISS
+Semantic search (top-k retrieval)
+LLM-based response generation
+Conversational memory (multi-turn chat)
+FastAPI backend
+Streamlit UI
+Source attribution
 
+Architecture
+User → Streamlit UI → FastAPI → Retriever (FAISS) → LLM → Response
 
 ## Project Structure
 
 rag-chatbot/
 
-│
 ├── app/
-│   ├── main.py
-│   ├── utils.py
-│   ├── retriever.py
-│   ├── summarizer.py
+│ ├── main.py
+│ ├── utils.py
+│ ├── retriever.py
+│ ├── summarizer.py
 │
 ├── data/
-│   └── irbookonlinereading.pdf
+│ └── irbookonlinereading.pdf
 │
 ├── vectorstore/
-│
+├── chat_ui.py
 ├── ingest.py
 ├── .env
 └── README.md
@@ -69,39 +72,40 @@ rag-chatbot/
 3. Stored in FAISS vector database
 4. Query is converted into embedding
 5. Top-k similar chunks are retrieved
+6. Pass context + query to LLM
 6. LLM generates answer using retrieved context
+
+## Conversational Memory
+
+Supports follow-up questions
+Maintains chat history
+Enables context-aware responses
 
 
 ## Example Query
 
 Input:
-Define information retrieval?
+User: What is Information Retrieval?
+User: What are its applications?
 
-Output:
-{
-"answer": "Information retrieval is the process...",
-"sources": [
-{"page": 201},
-{"page": 206}
-]
-}
 
 
 ## Tech Stack
 
 * Python
 * LangChain
-* OpenAI API
+* OpenAI (GPT-3.5 Turbo)
 * FAISS
 * FastAPI
 * PyPDF
+* Streamlit
 
 
 ## Future Improvements
 
-* Add chat UI (Streamlit or React)
-* Add conversational memory
-* Improve retrieval using reranking
+* Add Reranking
+* Multi-document support
+* UI enhancements
 * Use open-source LLMs
 * Deploy on cloud platforms
 
@@ -113,4 +117,4 @@ Saranya Alagarsamy
 
 ## Note
 
-This project demonstrates a complete end-to-end RAG pipeline including ingestion, vector storage, retrieval, and response generation.
+This project demonstrates a complete end-to-end RAG pipeline including ingestion, vector storage, retrieval with conversational memory and response generation for building context-aware AI applications.
